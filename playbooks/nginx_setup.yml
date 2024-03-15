@@ -1,0 +1,73 @@
+- hosts: all
+  gather_facts: no 
+
+  tasks:
+    - name: install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+      notify:
+        - restart nginx
+      become: yes
+      
+    - name: stop nginx
+      ansible.builtin.service:
+        name: nginx
+        state: stopped
+      notify:
+        - restart nginx
+      become: yes
+
+    - name: update nginx.conf
+      ansible.builtin.template:
+        src: ../files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+      notify:
+        - restart nginx
+      become: yes
+      
+    - name: create sites-available/ directory
+      ansible.builtin.file:
+        path: /etc/nginx/sites-available/
+        state: directory
+      become: yes
+
+    - name: create sites-enabled/ directory
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/             
+        state: directory
+      become: yes
+
+    - name: copy ansible.iphilka.ru.conf
+      ansible.builtin.template:
+        src: ../files/ansible.iphilka.ru.conf
+        dest: /etc/nginx/sites-available/ansible.iphilka.ru.conf
+      notify:
+        - restart nginx
+      become: yes
+
+    - name: create a symbolic link ansible.iphilka.ru.conf in sites-enabled/
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/ansible.iphilka.ru.conf
+        dest: /etc/nginx/sites-enabled/ansible.iphilka.ru.conf
+        state: link
+      notify:
+        - restart nginx
+      become: yes
+
+    - name: add nginx user to ansible-worker group
+      user:
+        name: nginx
+        groups: ansible-worker
+        append: yes
+      notify:
+        - restart nginx
+      become: yes
+
+  handlers:
+    - name: restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded            
+      become: yes

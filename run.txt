@@ -1,0 +1,5 @@
+root_ansible-playbook ./playbooks/create_user.yml -i hosts.ini
+root_ansible-playbook ./playbooks/install_git.yml -i hosts.ini
+root_ansible-playbook ./playbooks/clone_repo.yml -i hosts.ini
+root_ansible-playbook ./playbooks/nginx_setup.yml -i hosts.ini
+root_ansible-playbook ./playbooks/copy_statics.yml -i hosts.ini

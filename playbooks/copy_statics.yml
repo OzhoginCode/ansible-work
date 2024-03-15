@@ -1,0 +1,19 @@
+- hosts: all
+  gather_facts: no 
+
+  tasks:
+    - name: copy index.html
+      ansible.builtin.template:
+        src: ../files/index.html
+        dest: /home/ansible-worker/www/stud-template/index.html
+      notify:
+        - restart nginx
+      become: yes
+      become_user: ansible-worker
+
+  handlers:
+    - name: restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded            
+      become: yes

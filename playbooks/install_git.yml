@@ -1,0 +1,26 @@
+- hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: install git
+      ansible.builtin.apt:
+        name: git
+        update_cache: yes
+      become: yes
+
+    - name: create .ssh directory
+      ansible.builtin.file:
+        path: /home/ansible-worker/.ssh
+        state: directory
+        owner: ansible-worker
+        group: ansible-worker
+        mode: '0700'
+      become: yes
+
+    - name: add ssh key to user ansible-worker
+      ansible.builtin.template:    
+        src: ../ssh_keys/id_rsa.pub
+        dest: /home/ansible-worker/.ssh/authorized_keys
+        owner: ansible-worker
+        group: ansible-worker
+      become: yes
